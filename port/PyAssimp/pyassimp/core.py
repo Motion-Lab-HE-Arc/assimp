@@ -129,14 +129,16 @@ def _init(self, target = None, parent = None):
         # Create tuples
         if isinstance(obj, structs.assimp_structs_as_tuple):
             setattr(target, name, make_tuple(obj))
-            logger.debug(str(self) + ": Added array " + str(getattr(target, name)) +  " as self." + name.lower())
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(str(self) + ": Added array " + str(getattr(target, name)) +  " as self." + name.lower())
             continue
 
         if m.startswith('m') and len(m) > 1 and m[1].upper() == m[1]:
 
             if name == "parent":
                 setattr(target, name, parent)
-                logger.debug("Added a parent as self." + name)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("Added a parent as self." + name)
                 continue
 
             if helper.hasattr_silent(self, 'mNum' + m[1:]):
@@ -152,7 +154,8 @@ def _init(self, target = None, parent = None):
 
                 if not length: # empty!
                     setattr(target, name, [])
-                    logger.debug(str(self) + ": " + name + " is an empty list.")
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(str(self) + ": " + name + " is an empty list.")
                     continue
 
 
@@ -161,16 +164,19 @@ def _init(self, target = None, parent = None):
                         if numpy:
                             setattr(target, name, numpy.array([make_tuple(obj[i]) for i in range(length)], dtype=numpy.float32))
 
-                            logger.debug(str(self) + ": Added an array of numpy arrays (type "+ str(type(obj)) + ") as self." + name)
+                            if logger.isEnabledFor(logging.DEBUG):
+                                logger.debug(str(self) + ": Added an array of numpy arrays (type "+ str(type(obj)) + ") as self." + name)
                         else:
                             setattr(target, name, [make_tuple(obj[i]) for i in range(length)])
 
-                            logger.debug(str(self) + ": Added a list of lists (type "+ str(type(obj)) + ") as self." + name)
+                            if logger.isEnabledFor(logging.DEBUG):
+                                logger.debug(str(self) + ": Added a list of lists (type "+ str(type(obj)) + ") as self." + name)
 
                     else:
                         setattr(target, name, [obj[i] for i in range(length)]) #TODO: maybe not necessary to recreate an array?
 
-                        logger.debug(str(self) + ": Added list of " + str(obj) + " " + name + " as self." + name + " (type: " + str(type(obj)) + ")")
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(str(self) + ": Added list of " + str(obj) + " " + name + " as self." + name + " (type: " + str(type(obj)) + ")")
 
                         # initialize array elements
                         try:
@@ -203,7 +209,8 @@ def _init(self, target = None, parent = None):
 
             else: # starts with 'm' but not iterable
                 setattr(target, name, obj)
-                logger.debug("Added " + name + " as self." + name + " (type: " + str(type(obj)) + ")")
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("Added " + name + " as self." + name + " (type: " + str(type(obj)) + ")")
 
                 if _is_init_type(obj):
                     call_init(obj, target)
